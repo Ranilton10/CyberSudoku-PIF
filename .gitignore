@@ -1,4 +1,6 @@
+
 cyber_sudoku
 *.o
 build/
 .vscode/
+data/ranking.txt
