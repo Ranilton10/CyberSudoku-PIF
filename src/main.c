@@ -1,6 +1,7 @@
 
 #include "raylib.h"
 #include "menu.h"
+#include "jogo.h"
 #include <stdbool.h>
 
 #define LARGURA 1000
@@ -15,18 +16,40 @@ int main(void) {
 
     Tela telaAtual = MENU;
     bool sair = false;
+    bool jogoIniciado = false;
+
+    Jogo jogo;
 
     while (!WindowShouldClose() && !sair) {
+        if (telaAtual == PREPARACAO) {
+            if (!jogoIniciado) {
+                iniciarJogo(&jogo);
+                jogoIniciado = true;
+            }
+
+            atualizarJogo(&jogo);
+
+            if (IsKeyPressed(KEY_ESCAPE)) {
+                telaAtual = MENU;
+                jogoIniciado = false;
+            }
+        }
+
         BeginDrawing();
 
         desenharFundo(fundo, verde);
-        desenharTitulo(verde);
-        desenharMenu(&telaAtual, &sair, verde);
+
+        if (telaAtual == PREPARACAO) {
+            desenharJogo(&jogo);
+        } else {
+            desenharTitulo(verde);
+            desenharMenu(&telaAtual, &sair, verde);
+        }
 
         EndDrawing();
     }
 
     CloseWindow();
-    
+
     return 0;
 }
