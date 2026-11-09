@@ -3,6 +3,7 @@
 #include "menu.h"
 #include "jogo.h"
 #include <stdbool.h>
+#include <time.h>
 
 #define LARGURA 1000
 #define ALTURA 700
@@ -84,18 +85,27 @@ int main(void) {
             if (!jogoIniciado) {
                 iniciarJogo(&jogo);
                 jogoIniciado = true;
+                time_t inicio = time(NULL);
             }
 
             if (!jogo.concluido) {
                 if (IsKeyPressed(KEY_P)) {
                     telaAtual = PAUSA;
+                    //Pausa Timer
+                    atual += difftime(time(NULL),inicio);
                 } else {
                     atualizarJogo(&jogo);
+                    //Atualiza Timer
+                    time_t atual = time(NULL);
+                    int minutos = (int)difftime(atual, inicio) / 60;
+                    int segundos = (int)difftime(atual, inicio) % 60;
+                    char texto_timer[32];
+                    sprintf(texto_timer, "Tempo: %02d:%02d",minutos, segundos);
                 }
             }
         } else if (telaAtual == PAUSA) {
             if (IsKeyPressed(KEY_P)) {
-                telaAtual = PREPARACAO;
+                telaAtual = PREPARACAO;                
             }
         } else if (telaAtual == CONFIRMAR_SAIDA) {
             if (IsKeyPressed(KEY_P)) {
