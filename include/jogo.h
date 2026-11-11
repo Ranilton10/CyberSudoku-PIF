@@ -3,11 +3,12 @@
 #define JOGO_H
 
 #include "raylib.h"
+#include "historico.h"
 #include <stdbool.h>
 
 #define TAMANHO 9
 #define TOTAL_SIMBOLOS 9
-#define TOTAL_FASES 3
+#define TOTAL_FASES 2
 
 typedef struct {
     int tabuleiro[TAMANHO][TAMANHO];
@@ -20,6 +21,7 @@ typedef struct {
     int simboloSelecionado;
     bool concluido;
     Texture2D simbolos[TOTAL_SIMBOLOS];
+    Jogada *historico;
 } Jogo;
 
 void carregarSimbolos(Jogo *jogo);

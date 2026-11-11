@@ -1,5 +1,6 @@
 
 #include "jogo.h"
+#include <stdlib.h>
 
 #define VERDE (Color){57, 255, 100, 255}
 #define VERDE_CLARO (Color){120, 255, 160, 255}
@@ -31,7 +32,98 @@ void descarregarSimbolos(Jogo *jogo) {
     }
 }
 
+void embaralharTabuleiro(Jogo *jogo) {
+    int tamanho = jogo->tamanho;
+    int bloco;
+
+    if (tamanho == 4) {
+        bloco = 2;
+    } else {
+        bloco = 3;
+    }
+
+    int linhas[9];
+    int colunas[9];
+    int simbolos[9];
+
+    for (int i = 0; i < tamanho; i++) {
+        linhas[i] = i;
+        colunas[i] = i;
+        simbolos[i] = i + 1;
+    }
+
+    for (int i = tamanho - 1; i > 0; i--) {
+        int sorteado = rand() % (i + 1);
+
+        int auxiliar = simbolos[i];
+        simbolos[i] = simbolos[sorteado];
+        simbolos[sorteado] = auxiliar;
+    }
+
+    for (int inicio = 0; inicio < tamanho; inicio += bloco) {
+        for (int i = bloco - 1; i > 0; i--) {
+            int sorteado = rand() % (i + 1);
+
+            int auxiliar = linhas[inicio + i];
+            linhas[inicio + i] = linhas[inicio + sorteado];
+            linhas[inicio + sorteado] = auxiliar;
+
+            sorteado = rand() % (i + 1);
+
+            auxiliar = colunas[inicio + i];
+            colunas[inicio + i] = colunas[inicio + sorteado];
+            colunas[inicio + sorteado] = auxiliar;
+        }
+    }
+
+    for (int grupo = tamanho / bloco - 1; grupo > 0; grupo--) {
+        int sorteado = rand() % (grupo + 1);
+
+        for (int i = 0; i < bloco; i++) {
+            int auxiliar = linhas[grupo * bloco + i];
+            linhas[grupo * bloco + i] =
+                linhas[sorteado * bloco + i];
+            linhas[sorteado * bloco + i] = auxiliar;
+        }
+
+        sorteado = rand() % (grupo + 1);
+
+        for (int i = 0; i < bloco; i++) {
+            int auxiliar = colunas[grupo * bloco + i];
+            colunas[grupo * bloco + i] =
+                colunas[sorteado * bloco + i];
+            colunas[sorteado * bloco + i] = auxiliar;
+        }
+    }
+
+    int novoTabuleiro[9][9] = {0};
+    int novaSolucao[9][9] = {0};
+
+    for (int i = 0; i < tamanho; i++) {
+        for (int j = 0; j < tamanho; j++) {
+            int valor = jogo->tabuleiro[linhas[i]][colunas[j]];
+            int resposta = jogo->solucao[linhas[i]][colunas[j]];
+
+            if (valor != 0) {
+                novoTabuleiro[i][j] = simbolos[valor - 1];
+            }
+
+            novaSolucao[i][j] = simbolos[resposta - 1];
+        }
+    }
+
+    for (int i = 0; i < tamanho; i++) {
+        for (int j = 0; j < tamanho; j++) {
+            jogo->tabuleiro[i][j] = novoTabuleiro[i][j];
+            jogo->solucao[i][j] = novaSolucao[i][j];
+            jogo->fixas[i][j] = novoTabuleiro[i][j] != 0;
+        }
+    }
+}
+
 void iniciarFase(Jogo *jogo, int fase) {
+    liberarHistorico(&jogo->historico);
+
     int inicial4[4][4] = {
         {1, 0, 3, 4},
         {0, 4, 1, 0},
@@ -88,35 +180,24 @@ void iniciarFase(Jogo *jogo, int fase) {
 
     for (int i = 0; i < jogo->tamanho; i++) {
         for (int j = 0; j < jogo->tamanho; j++) {
-
-            int valor = 0;
-            int resposta = 0;
+            int valor;
+            int resposta;
 
             if (fase == 1) {
                 valor = inicial4[i][j];
                 resposta = resposta4[i][j];
-            } else if (fase == 2) {
+            } else {
                 valor = inicial9[i][j];
                 resposta = resposta9[i][j];
-            } else {
-                valor = inicial9[j][i];
-                resposta = resposta9[j][i];
-
-                if (valor != 0) {
-                    valor = valor % 9 + 1;
-                }
-
-                resposta = resposta % 9 + 1;
             }
 
             jogo->tabuleiro[i][j] = valor;
             jogo->solucao[i][j] = resposta;
-
-            if (valor != 0) {
-                jogo->fixas[i][j] = true;
-            }
+            jogo->fixas[i][j] = valor != 0;
         }
     }
+
+    embaralharTabuleiro(jogo);
 
     jogo->linhaSelecionada = -1;
     jogo->colunaSelecionada = -1;
@@ -181,6 +262,28 @@ bool verificarVitoria(Jogo *jogo) {
     return true;
 }
 
+void desenharSimbolo(Texture2D imagem, Rectangle destino, Color cor) {
+    if (imagem.id == 0) {
+        return;
+    }
+
+    Rectangle origem = {
+        0,
+        0,
+        (float)imagem.width,
+        (float)imagem.height
+    };
+
+    DrawTexturePro(
+        imagem,
+        origem,
+        destino,
+        (Vector2){0, 0},
+        0,
+        cor
+    );
+}
+
 void atualizarJogo(Jogo *jogo) {
     if (jogo->concluido) {
         return;
@@ -192,19 +295,22 @@ void atualizarJogo(Jogo *jogo) {
     int painelX;
     int larguraBotao;
     int espacoBotao;
+    int yBotoes;
 
     if (jogo->tamanho == 4) {
         celula = 88;
-        y = 205;
+        y = 210;
         painelX = 324;
         larguraBotao = 78;
         espacoBotao = 90;
+        yBotoes = 605;
     } else {
-        celula = 45;
-        y = 155;
-        painelX = 255;
-        larguraBotao = 48;
-        espacoBotao = 54;
+        celula = 42;
+        y = 190;
+        painelX = 282;
+        larguraBotao = 43;
+        espacoBotao = 49;
+        yBotoes = 625;
     }
 
     x = (1000 - jogo->tamanho * celula) / 2;
@@ -215,9 +321,9 @@ void atualizarJogo(Jogo *jogo) {
         for (int i = 0; i < jogo->tamanho; i++) {
             Rectangle botao = {
                 painelX + i * espacoBotao,
-                605,
+                yBotoes,
                 larguraBotao,
-                55
+                45
             };
 
             if (CheckCollisionPointRec(mouse, botao)) {
@@ -230,20 +336,30 @@ void atualizarJogo(Jogo *jogo) {
             mouse.y >= y &&
             mouse.y < y + jogo->tamanho * celula) {
 
-            int coluna = (mouse.x - x) / celula;
-            int linha = (mouse.y - y) / celula;
+            int coluna = (int)(mouse.x - x) / celula;
+            int linha = (int)(mouse.y - y) / celula;
 
             if (!jogo->fixas[linha][coluna]) {
+                int valorAnterior = jogo->tabuleiro[linha][coluna];
 
                 if (jogo->linhaSelecionada == linha &&
                     jogo->colunaSelecionada == coluna &&
-                    jogo->tabuleiro[linha][coluna] != 0) {
+                    valorAnterior != 0) {
 
                     jogo->tabuleiro[linha][coluna] = 0;
-
                 } else {
                     jogo->tabuleiro[linha][coluna] =
                         jogo->simboloSelecionado;
+                }
+
+                if (valorAnterior != jogo->tabuleiro[linha][coluna]) {
+                    adicionarJogada(
+                        &jogo->historico,
+                        linha,
+                        coluna,
+                        jogo->tabuleiro[linha][coluna],
+                        jogo->tabuleiro[linha][coluna] == 0
+                    );
                 }
 
                 jogo->linhaSelecionada = linha;
@@ -263,7 +379,17 @@ void atualizarJogo(Jogo *jogo) {
 
             if (linha >= 0 && coluna >= 0) {
                 if (!jogo->fixas[linha][coluna]) {
-                    jogo->tabuleiro[linha][coluna] = numero;
+                    if (jogo->tabuleiro[linha][coluna] != numero) {
+                        jogo->tabuleiro[linha][coluna] = numero;
+
+                        adicionarJogada(
+                            &jogo->historico,
+                            linha,
+                            coluna,
+                            numero,
+                            0
+                        );
+                    }
                 }
             }
         }
@@ -277,7 +403,17 @@ void atualizarJogo(Jogo *jogo) {
 
         if (linha >= 0 && coluna >= 0) {
             if (!jogo->fixas[linha][coluna]) {
-                jogo->tabuleiro[linha][coluna] = 0;
+                if (jogo->tabuleiro[linha][coluna] != 0) {
+                    jogo->tabuleiro[linha][coluna] = 0;
+
+                    adicionarJogada(
+                        &jogo->historico,
+                        linha,
+                        coluna,
+                        0,
+                        1
+                    );
+                }
             }
         }
     }
@@ -285,28 +421,6 @@ void atualizarJogo(Jogo *jogo) {
     if (verificarVitoria(jogo)) {
         jogo->concluido = true;
     }
-}
-
-void desenharSimbolo(Texture2D imagem, Rectangle destino, Color cor) {
-    if (imagem.id == 0) {
-        return;
-    }
-
-    Rectangle origem = {
-        0,
-        0,
-        imagem.width,
-        imagem.height
-    };
-
-    DrawTexturePro(
-        imagem,
-        origem,
-        destino,
-        (Vector2){0, 0},
-        0,
-        cor
-    );
 }
 
 void desenharJogo(Jogo *jogo) {
@@ -317,34 +431,39 @@ void desenharJogo(Jogo *jogo) {
     int painelX;
     int larguraBotao;
     int espacoBotao;
+    int yBotoes;
+    int yMensagem;
 
     if (jogo->tamanho == 4) {
         celula = 88;
-        y = 205;
+        y = 210;
         bloco = 2;
         painelX = 324;
         larguraBotao = 78;
         espacoBotao = 90;
+        yBotoes = 605;
+        yMensagem = 575;
     } else {
-        celula = 45;
-        y = 155;
+        celula = 42;
+        y = 190;
         bloco = 3;
-        painelX = 255;
-        larguraBotao = 48;
-        espacoBotao = 54;
+        painelX = 282;
+        larguraBotao = 43;
+        espacoBotao = 49;
+        yBotoes = 625;
+        yMensagem = 592;
     }
 
     x = (1000 - jogo->tamanho * celula) / 2;
 
-    const char *nomes[4] = {
+    const char *nomes[3] = {
         "",
         "ACESSO INICIAL",
-        "QUEBRA DE FIREWALL",
-        "SISTEMA CENTRAL"
+        "QUEBRA DE FIREWALL"
     };
 
     DrawText(
-        TextFormat("FASE %02d / 03", jogo->fase),
+        TextFormat("FASE %02d / %02d", jogo->fase, TOTAL_FASES),
         300, 75, 19, VERDE_CLARO
     );
 
@@ -380,7 +499,6 @@ void desenharJogo(Jogo *jogo) {
 
     for (int i = 0; i < jogo->tamanho; i++) {
         for (int j = 0; j < jogo->tamanho; j++) {
-
             Rectangle area = {
                 x + j * celula,
                 y + i * celula,
@@ -471,27 +589,49 @@ void desenharJogo(Jogo *jogo) {
         );
     }
 
+    for (int i = 0; i < jogo->tamanho; i++) {
+        const char *textoLinha = TextFormat("L%d", i + 1);
+        int larguraLinha = MeasureText(textoLinha, 12);
+
+        DrawText(
+            textoLinha,
+            x - larguraLinha - 15,
+            y + i * celula + (celula - 12) / 2,
+            12,
+            VERDE_CLARO
+        );
+    }
+
+    for (int j = 0; j < jogo->tamanho; j++) {
+        const char *textoColuna = TextFormat("C%d", j + 1);
+        int larguraColuna = MeasureText(textoColuna, 12);
+
+        DrawText(
+            textoColuna,
+            x + j * celula + (celula - larguraColuna) / 2,
+            y - 27,
+            12,
+            VERDE_CLARO
+        );
+    }
+
     if (existeConflito) {
-        DrawText("CONFLITO DETECTADO", 300, 575, 18, RED);
+        DrawText("CONFLITO DETECTADO", 300, yMensagem, 18, RED);
     } else if (jogo->concluido) {
-        DrawText("SISTEMA INVADIDO!", 300, 575, 18, VERDE);
+        DrawText("SISTEMA INVADIDO!", 300, yMensagem, 18, VERDE);
     } else {
-        DrawText("SELECIONE UM SIMBOLO", 300, 575, 18, VERDE_CLARO);
+        DrawText("SELECIONE UM SIMBOLO", 300, yMensagem, 18, VERDE_CLARO);
     }
 
     for (int i = 0; i < jogo->tamanho; i++) {
         Rectangle botao = {
             painelX + i * espacoBotao,
-            605,
+            yBotoes,
             larguraBotao,
-            55
+            45
         };
 
-        bool selecionado = false;
-
-        if (jogo->simboloSelecionado == i + 1) {
-            selecionado = true;
-        }
+        bool selecionado = jogo->simboloSelecionado == i + 1;
 
         Color fundo = {14, 34, 24, 255};
         Color borda = Fade(VERDE, 0.5f);
@@ -525,7 +665,7 @@ void desenharJogo(Jogo *jogo) {
 
         Rectangle destino = {
             botao.x + margem,
-            botao.y + (55 - lado) / 2,
+            botao.y + (45 - lado) / 2,
             lado,
             lado
         };
@@ -547,4 +687,6 @@ void desenharJogo(Jogo *jogo) {
         16,
         CINZA
     );
+
+    desenharHistorico(jogo->historico, jogo->simbolos);
 }

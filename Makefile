@@ -3,16 +3,14 @@ CC = gcc
 CFLAGS = -Wall -Wextra -std=c11 -Iinclude
 LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
-TARGET = cyber_sudoku
-SRC = src/main.c src/menu.c src/jogo.c
+SRC = src/main.c src/menu.c src/jogo.c src/historico.c
+EXEC = cyber_sudoku
 
 all:
-	$(CC) $(CFLAGS) $(SRC) -o $(TARGET) $(LIBS)
+	$(CC) $(CFLAGS) $(SRC) -o $(EXEC) $(LIBS)
 
 run: all
-	./$(TARGET)
+	./$(EXEC)
 
 clean:
-	rm -f $(TARGET)
-
-.PHONY: all run clean
+	rm -f $(EXEC)
