@@ -1,5 +1,6 @@
 
 #include "menu.h"
+#include "ranking.h"
 #include <string.h>
 
 #define LARGURA 1000
@@ -9,6 +10,8 @@ static const Color VERDE_CLARO = {110, 255, 155, 255};
 static const Color FUNDO_PAINEL = {12, 24, 20, 255};
 static const Color FUNDO_BOTAO = {19, 43, 32, 255};
 static const Color CINZA_TEXTO = {170, 190, 180, 255};
+
+static Ranking rankingTela;
 
 static void textoCentralizado(const char *texto, int y, int tamanho, Color cor) {
     int largura = MeasureText(texto, tamanho);
@@ -116,6 +119,7 @@ void desenharMenu(Tela *telaAtual, bool *sair, Color verde) {
                 } else if (i == 1) {
                     *telaAtual = INSTRUCOES;
                 } else if (i == 2) {
+                    ranking_carregar(&rankingTela);
                     *telaAtual = RANKING;
                 } else {
                     *sair = true;
@@ -171,8 +175,22 @@ void desenharMenu(Tela *telaAtual, bool *sair, Color verde) {
 
         textoCentralizado("RANKING DE HACKERS", 255, 27, verde);
         textoCentralizado("REGISTROS DE INVASAO", 300, 17, CINZA_TEXTO);
-        textoCentralizado("Nenhuma campanha concluida.", 395, 21, RAYWHITE);
-        textoCentralizado("Os melhores hackers aparecerao aqui.", 430, 17, CINZA_TEXTO);
+
+        if (rankingTela.quantidade == 0) {
+            textoCentralizado("Nenhuma campanha concluida.", 395, 21, RAYWHITE);
+            textoCentralizado("Os melhores hackers aparecerao aqui.", 430, 17, CINZA_TEXTO);
+        }
+
+        for (int i = 0; i < rankingTela.quantidade; i++) {
+            int y = 330 + i * 23;
+            Color cor = (i == 0) ? GOLD : RAYWHITE;
+
+            DrawText(TextFormat("%02d", i + 1), 300, y, 18, VERDE_CLARO);
+            DrawText(rankingTela.entradas[i].nome, 350, y, 18, cor);
+
+            const char *pontos = TextFormat("%d", rankingTela.entradas[i].pontos);
+            DrawText(pontos, 700 - MeasureText(pontos, 18), y, 18, cor);
+        }
 
         Rectangle voltar = {390, 610, 220, 50};
 

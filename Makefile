@@ -1,9 +1,8 @@
-
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11 -Iinclude
 LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
-SRC = src/main.c src/menu.c src/jogo.c src/historico.c
+SRC = src/main.c src/menu.c src/jogo.c src/historico.c src/ranking.c
 EXEC = cyber_sudoku
 
 all:

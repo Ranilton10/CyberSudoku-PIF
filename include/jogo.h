@@ -20,6 +20,8 @@ typedef struct {
     int colunaSelecionada;
     int simboloSelecionado;
     bool concluido;
+    int pontos;
+    bool acertou[TAMANHO][TAMANHO];
     Texture2D simbolos[TOTAL_SIMBOLOS];
     Jogada *historico;
 } Jogo;

@@ -1,5 +1,6 @@
 
 #include "jogo.h"
+#include "ranking.h"
 #include <stdlib.h>
 
 #define VERDE (Color){57, 255, 100, 255}
@@ -11,7 +12,7 @@ void carregarSimbolos(Jogo *jogo) {
         "assets/images/X.png",
         "assets/images/circulo.png",
         "assets/images/confere.png",
-        "assets/images/coração.png",
+        "assets/images/coracao.png",
         "assets/images/mais.png",
         "assets/images/pentagono.png",
         "assets/images/quadrado.png",
@@ -175,6 +176,7 @@ void iniciarFase(Jogo *jogo, int fase) {
             jogo->tabuleiro[i][j] = 0;
             jogo->solucao[i][j] = 0;
             jogo->fixas[i][j] = false;
+            jogo->acertou[i][j] = false;
         }
     }
 
@@ -284,6 +286,26 @@ void desenharSimbolo(Texture2D imagem, Rectangle destino, Color cor) {
     );
 }
 
+/* Pontua uma jogada: compara o simbolo colocado com a solucao.
+   Acerto: +100, uma unica vez por celula (impede apagar e repor para farmar pontos).
+   Erro: perde metade dos pontos atuais. */
+static void pontuarJogada(Jogo *jogo, int linha, int coluna) {
+    int valor = jogo->tabuleiro[linha][coluna];
+
+    if (valor == 0) {
+        return;
+    }
+
+    if (valor == jogo->solucao[linha][coluna]) {
+        if (!jogo->acertou[linha][coluna]) {
+            jogo->acertou[linha][coluna] = true;
+            pontuacao_acerto(&jogo->pontos);
+        }
+    } else {
+        pontuacao_erro(&jogo->pontos);
+    }
+}
+
 void atualizarJogo(Jogo *jogo) {
     if (jogo->concluido) {
         return;
@@ -360,6 +382,8 @@ void atualizarJogo(Jogo *jogo) {
                         jogo->tabuleiro[linha][coluna],
                         jogo->tabuleiro[linha][coluna] == 0
                     );
+
+                    pontuarJogada(jogo, linha, coluna);
                 }
 
                 jogo->linhaSelecionada = linha;
@@ -389,6 +413,8 @@ void atualizarJogo(Jogo *jogo) {
                             numero,
                             0
                         );
+
+                        pontuarJogada(jogo, linha, coluna);
                     }
                 }
             }
@@ -420,6 +446,7 @@ void atualizarJogo(Jogo *jogo) {
 
     if (verificarVitoria(jogo)) {
         jogo->concluido = true;
+        pontuacao_fase(&jogo->pontos);
     }
 }
 

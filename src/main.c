@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include "menu.h"
 #include "jogo.h"
+#include "ranking.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
@@ -32,7 +33,8 @@ int main(void) {
     int proximaFase = 1;
 
     float tempoTotal = 0.0f;
-    int pontuacaoTotal = 0;
+    bool pontuacaoSalva = false;
+    int posicaoRanking = 0;
 
     Music musica = LoadMusicStream("assets/sounds/loaben.mp3");
     bool musicaCarregada = IsMusicValid(musica);
@@ -102,7 +104,9 @@ int main(void) {
         if (telaAtual == PREPARACAO && !jogoIniciado) {
             jogoIniciado = true;
             tempoTotal = 0.0f;
-            pontuacaoTotal = 0;
+            jogo.pontos = 0;
+            pontuacaoSalva = false;
+            posicaoRanking = 0;
             proximaFase = 1;
             tempoTransicao = 0.0f;
             emTransicao = true;
@@ -116,6 +120,16 @@ int main(void) {
                 emTransicao = false;
                 tempoTransicao = 0.0f;
             }
+        }
+
+        if (telaAtual == PREPARACAO && !emTransicao &&
+            jogo.concluido && jogo.fase == TOTAL_FASES &&
+            !pontuacaoSalva) {
+
+            Ranking ranking;
+            ranking_carregar(&ranking);
+            posicaoRanking = ranking_inserir(&ranking, jogador.nome, jogo.pontos);
+            pontuacaoSalva = true;
         }
 
         if (telaAtual == PREPARACAO && !emTransicao) {
@@ -264,6 +278,11 @@ int main(void) {
                 770, 75, 20, verde
             );
 
+            DrawText(
+                TextFormat("PONTOS: %d", jogo.pontos),
+                770, 135, 20, verde
+            );
+
             if (jogo.concluido) {
                 DrawRectangle(
                     0, 0, LARGURA, ALTURA,
@@ -337,7 +356,7 @@ int main(void) {
                     );
 
                     DrawText(
-                        TextFormat("%d", pontuacaoTotal),
+                        TextFormat("%d", jogo.pontos),
                         565, 385, 23, verde
                     );
 
@@ -346,9 +365,25 @@ int main(void) {
                     DrawText(
                         fases,
                         (LARGURA - MeasureText(fases, 19)) / 2,
-                        440,
+                        430,
                         19,
                         verde
+                    );
+
+                    const char *posicao;
+
+                    if (posicaoRanking > 0) {
+                        posicao = TextFormat("POSICAO NO RANKING: #%d", posicaoRanking);
+                    } else {
+                        posicao = "FORA DO TOP 10";
+                    }
+
+                    DrawText(
+                        posicao,
+                        (LARGURA - MeasureText(posicao, 18)) / 2,
+                        458,
+                        18,
+                        RAYWHITE
                     );
 
                     Rectangle botao = {350, 490, 300, 55};
@@ -396,6 +431,17 @@ int main(void) {
                         330,
                         19,
                         RAYWHITE
+                    );
+
+                    const char *textoPontos =
+                        TextFormat("PONTUACAO: %d", jogo.pontos);
+
+                    DrawText(
+                        textoPontos,
+                        (LARGURA - MeasureText(textoPontos, 19)) / 2,
+                        360,
+                        19,
+                        verde
                     );
 
                     Rectangle botao = {350, 395, 300, 60};
