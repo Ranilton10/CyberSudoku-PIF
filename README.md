@@ -15,3 +15,7 @@
 <p>Dificuldade Fácil: Possui 4 linhas e 4 colunas, totalizando 16 células para serem preenchidas com 4 símbolos diferentes</p>
 <p>Dificuldade Difícil: Possui 9 linhas e 9 colunas, totalizando 81 células para serem preenchidas com 9 símbolos diferentes</p>
 <p> O jogo encerra quando você completa todas as fases e invade o sistema</p>
+<p><b> Para rodar o jogo escreva no terminar:</b></p>
+<p>$env:PATH = "C:\raylib\w64devkit\bin;" + $env:PATH</p>
+<p>gcc src/main.c src/menu.c src/jogo.c src/historico.c src/ranking.c -o cyber_sudoku.exe -Iinclude -Wall -Wextra -std=c11 -lraylib -lopengl32 -lgdi32 -lwinmm</p>
+<p>.\cyber_sudoku.exe </p>
