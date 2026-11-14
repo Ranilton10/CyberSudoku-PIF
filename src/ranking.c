@@ -9,7 +9,7 @@ void pontuacao_acerto(int *pontos) {
 }
 
 void pontuacao_erro(int *pontos) {
-    *pontos -= *pontos / 2;   /*perde metade (divisao inteira)*/
+    *pontos -= *pontos / 2;   /*perde metade  (divisao inteira)*/
 }
 
 void pontuacao_fase(int *pontos) {

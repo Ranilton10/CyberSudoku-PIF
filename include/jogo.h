@@ -24,6 +24,7 @@ typedef struct {
     bool acertou[TAMANHO][TAMANHO];
     Texture2D simbolos[TOTAL_SIMBOLOS];
     Jogada *historico;
+    
 } Jogo;
 
 void carregarSimbolos(Jogo *jogo);

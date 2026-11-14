@@ -27,6 +27,7 @@ void pontuacao_erro(int *pontos);
 /* Passou de fase: +1000 */
 void pontuacao_fase(int *pontos);
 
+
 /*Ranking (Top 10 salvo em arquivo)*/
 /*Carrega do arquivo se nao existir, começa vazio. Retorna 1 se leu, 0 se vazio/novo.*/
 int ranking_carregar(Ranking *r);

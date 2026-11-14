@@ -20,6 +20,7 @@ void carregarSimbolos(Jogo *jogo) {
         "assets/images/triangulo.png"
     };
 
+    
     for (int i = 0; i < 9; i++) {
         jogo->simbolos[i] = LoadTexture(arquivos[i]);
     }

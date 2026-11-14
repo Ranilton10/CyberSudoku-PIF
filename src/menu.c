@@ -18,6 +18,7 @@ static void textoCentralizado(const char *texto, int y, int tamanho, Color cor) 
     DrawText(texto, (LARGURA - largura) / 2, y, tamanho, cor);
 }
 
+
 static void desenharPainel(Rectangle area, Color verde) {
     DrawRectangleRounded(area, 0.035f, 8, FUNDO_PAINEL);
     DrawRectangleRoundedLinesEx(area, 0.035f, 8, 1.5f, Fade(verde, 0.55f));

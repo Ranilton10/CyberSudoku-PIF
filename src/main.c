@@ -19,6 +19,7 @@ int main(void) {
 
     SetTargetFPS(60);
     SetExitKey(KEY_NULL);
+    
 
     Color fundo = {8, 12, 10, 255};
     Color verde = {57, 255, 100, 255};
