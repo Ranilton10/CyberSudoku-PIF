@@ -18,7 +18,6 @@ static void textoCentralizado(const char *texto, int y, int tamanho, Color cor) 
     DrawText(texto, (LARGURA - largura) / 2, y, tamanho, cor);
 }
 
-
 static void desenharPainel(Rectangle area, Color verde) {
     DrawRectangleRounded(area, 0.035f, 8, FUNDO_PAINEL);
     DrawRectangleRoundedLinesEx(area, 0.035f, 8, 1.5f, Fade(verde, 0.55f));
@@ -81,7 +80,6 @@ void desenharFundo(Color fundo, Color verde) {
     DrawRectangle(0, ALTURA - 5, LARGURA, 5, Fade(verde, 0.65f));
 
     DrawText("CYBER SYSTEM // ONLINE", 28, 25, 15, Fade(verde, 0.65f));
-    
 }
 
 void desenharTitulo(Color verde) {
@@ -155,8 +153,8 @@ void desenharMenu(Tela *telaAtual, bool *sair, Color verde) {
 
         desenharSecao(
             "CAMPANHA",
-            "Fase 1: tabuleiro 4x4. Fases 2 e 3: tabuleiro 9x9.",
-            "Complete as tres fases para registrar sua pontuacao.",
+            "Fase 1: tabuleiro 4x4. Fase 2: tabuleiro 9x9.",
+            "Complete as duas fases para registrar sua pontuacao.",
             450,
             verde
         );
@@ -171,26 +169,51 @@ void desenharMenu(Tela *telaAtual, bool *sair, Color verde) {
     }
 
     else if (*telaAtual == RANKING) {
-        Rectangle painel = {260, 220, 480, 355};
+        Rectangle painel = {145, 205, 710, 385};
         desenharPainel(painel, verde);
 
-        textoCentralizado("RANKING DE HACKERS", 255, 27, verde);
-        textoCentralizado("REGISTROS DE INVASAO", 300, 17, CINZA_TEXTO);
+        textoCentralizado("RANKING DE HACKERS", 225, 27, verde);
+        textoCentralizado("REGISTROS DE INVASAO", 265, 17, CINZA_TEXTO);
+
+        DrawText("POS", 180, 315, 17, VERDE_CLARO);
+        DrawText("JOGADOR", 245, 315, 17, VERDE_CLARO);
+        DrawText("PONTOS", 585, 315, 17, VERDE_CLARO);
+        DrawText("TEMPO", 730, 315, 17, VERDE_CLARO);
+
+        DrawLine(175, 345, 825, 345, Fade(verde, 0.5f));
 
         if (rankingTela.quantidade == 0) {
-            textoCentralizado("Nenhuma campanha concluida.", 395, 21, RAYWHITE);
-            textoCentralizado("Os melhores hackers aparecerao aqui.", 430, 17, CINZA_TEXTO);
+            textoCentralizado("Nenhuma campanha concluida.", 415, 21, RAYWHITE);
+            textoCentralizado("Os melhores hackers aparecerao aqui.", 450, 17, CINZA_TEXTO);
         }
 
         for (int i = 0; i < rankingTela.quantidade; i++) {
-            int y = 330 + i * 23;
+            int y = 355 + i * 22;
             Color cor = (i == 0) ? GOLD : RAYWHITE;
 
-            DrawText(TextFormat("%02d", i + 1), 300, y, 18, VERDE_CLARO);
-            DrawText(rankingTela.entradas[i].nome, 350, y, 18, cor);
+            DrawText(
+                TextFormat("%02d", i + 1),
+                180, y, 17, VERDE_CLARO
+            );
 
-            const char *pontos = TextFormat("%d", rankingTela.entradas[i].pontos);
-            DrawText(pontos, 700 - MeasureText(pontos, 18), y, 18, cor);
+            DrawText(
+                rankingTela.entradas[i].nome,
+                245, y, 17, cor
+            );
+
+            DrawText(
+                TextFormat("%d", rankingTela.entradas[i].pontos),
+                585, y, 17, cor
+            );
+
+            int tempo = rankingTela.entradas[i].tempo;
+            int minutos = tempo / 60;
+            int segundos = tempo % 60;
+
+            DrawText(
+                TextFormat("%02d:%02d", minutos, segundos),
+                730, y, 17, cor
+            );
         }
 
         Rectangle voltar = {390, 610, 220, 50};

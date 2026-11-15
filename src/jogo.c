@@ -20,7 +20,6 @@ void carregarSimbolos(Jogo *jogo) {
         "assets/images/triangulo.png"
     };
 
-    
     for (int i = 0; i < 9; i++) {
         jogo->simbolos[i] = LoadTexture(arquivos[i]);
     }
@@ -142,14 +141,14 @@ void iniciarFase(Jogo *jogo, int fase) {
 
     int inicial9[9][9] = {
         {5, 3, 4, 0, 7, 0, 0, 0, 0},
-        {6, 0, 0, 1, 9, 5, 0, 0, 0},
-        {0, 9, 8, 0, 0, 2, 0, 6, 0},
-        {8, 0, 0, 0, 6, 0, 0, 0, 3},
+        {6, 0, 0, 1, 9, 5, 3, 0, 0},
+        {1, 9, 8, 0, 0, 2, 0, 6, 0},
+        {8, 0, 0, 7, 6, 0, 0, 0, 3},
         {4, 0, 0, 8, 5, 3, 0, 0, 1},
-        {7, 0, 0, 0, 2, 0, 0, 0, 6},
-        {0, 6, 0, 0, 0, 0, 2, 8, 4},
-        {0, 0, 0, 4, 1, 9, 0, 0, 5},
-        {0, 0, 0, 0, 8, 0, 1, 7, 9}
+        {7, 0, 0, 9, 2, 0, 0, 0, 6},
+        {9, 6, 0, 0, 0, 0, 2, 8, 4},
+        {0, 8, 0, 4, 1, 9, 0, 0, 5},
+        {3, 0, 0, 0, 8, 0, 1, 7, 9}
     };
 
     int resposta9[9][9] = {
@@ -206,10 +205,6 @@ void iniciarFase(Jogo *jogo, int fase) {
     jogo->colunaSelecionada = -1;
     jogo->simboloSelecionado = 1;
     jogo->concluido = false;
-}
-
-void iniciarJogo(Jogo *jogo) {
-    iniciarFase(jogo, 1);
 }
 
 bool verificarConflito(Jogo *jogo, int linha, int coluna) {
@@ -287,9 +282,6 @@ void desenharSimbolo(Texture2D imagem, Rectangle destino, Color cor) {
     );
 }
 
-/* Pontua uma jogada: compara o simbolo colocado com a solucao.
-   Acerto: +100, uma unica vez por celula (impede apagar e repor para farmar pontos).
-   Erro: perde metade dos pontos atuais. */
 static void pontuarJogada(Jogo *jogo, int linha, int coluna) {
     int valor = jogo->tabuleiro[linha][coluna];
 

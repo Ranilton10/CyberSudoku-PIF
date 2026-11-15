@@ -14,12 +14,10 @@ int main(void) {
     srand((unsigned int)time(NULL));
 
     InitWindow(LARGURA, ALTURA, "Cyber Sudoku");
-
     InitAudioDevice();
 
     SetTargetFPS(60);
     SetExitKey(KEY_NULL);
-    
 
     Color fundo = {8, 12, 10, 255};
     Color verde = {57, 255, 100, 255};
@@ -123,13 +121,23 @@ int main(void) {
             }
         }
 
-        if (telaAtual == PREPARACAO && !emTransicao &&
-            jogo.concluido && jogo.fase == TOTAL_FASES &&
+        if (telaAtual == PREPARACAO &&
+            !emTransicao &&
+            jogo.concluido &&
+            jogo.fase == TOTAL_FASES &&
             !pontuacaoSalva) {
 
             Ranking ranking;
+
             ranking_carregar(&ranking);
-            posicaoRanking = ranking_inserir(&ranking, jogador.nome, jogo.pontos);
+
+            posicaoRanking = ranking_inserir(
+                &ranking,
+                jogador.nome,
+                jogo.pontos,
+                (int)tempoTotal
+            );
+
             pontuacaoSalva = true;
         }
 
@@ -281,7 +289,7 @@ int main(void) {
 
             DrawText(
                 TextFormat("PONTOS: %d", jogo.pontos),
-                770, 135, 20, verde
+                38, 75, 20, verde
             );
 
             if (jogo.concluido) {
@@ -374,7 +382,12 @@ int main(void) {
                     const char *posicao;
 
                     if (posicaoRanking > 0) {
-                        posicao = TextFormat("POSICAO NO RANKING: #%d", posicaoRanking);
+                        posicao = TextFormat(
+                            "POSICAO NO RANKING: #%d",
+                            posicaoRanking
+                        );
+                    } else if (posicaoRanking == -1) {
+                        posicao = "ERRO AO SALVAR RANKING";
                     } else {
                         posicao = "FORA DO TOP 10";
                     }
