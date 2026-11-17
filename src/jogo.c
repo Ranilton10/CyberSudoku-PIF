@@ -1,6 +1,7 @@
 
 #include "jogo.h"
 #include "ranking.h"
+#include "dica.h"
 #include <stdlib.h>
 
 #define VERDE (Color){57, 255, 100, 255}
@@ -14,7 +15,7 @@ void carregarSimbolos(Jogo *jogo) {
         "assets/images/confere.png",
         "assets/images/coracao.png",
         "assets/images/mais.png",
-        "assets/images/pentagono.png",
+        "assets/images/fita.png",
         "assets/images/quadrado.png",
         "assets/images/trevo.png",
         "assets/images/triangulo.png"
@@ -353,7 +354,14 @@ void atualizarJogo(Jogo *jogo) {
 
             int coluna = (int)(mouse.x - x) / celula;
             int linha = (int)(mouse.y - y) / celula;
-
+            if (dica.ativa){
+                if(jogo->tabuleiro[linha][coluna] != jogo->solucao[linha][coluna]){
+                    jogo->tabuleiro[linha][coluna] = jogo->solucao[linha][coluna];
+                    dica.quantidade--;
+                    dica.ativa = false;
+                }
+                return;
+            }
             if (!jogo->fixas[linha][coluna]) {
                 int valorAnterior = jogo->tabuleiro[linha][coluna];
 

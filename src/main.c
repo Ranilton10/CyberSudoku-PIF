@@ -3,13 +3,14 @@
 #include "menu.h"
 #include "jogo.h"
 #include "ranking.h"
+#include "dica.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
 
 #define LARGURA 1000
 #define ALTURA 700
-
+Dica dica;
 int main(void) {
     srand((unsigned int)time(NULL));
 
@@ -54,6 +55,8 @@ int main(void) {
     RenderTexture2D telaJogo = LoadRenderTexture(LARGURA, ALTURA);
 
     carregarSimbolos(&jogo);
+    dica.quantidade = 3;
+    dica.ativa = false;
 
     while (!WindowShouldClose() && !sair) {
 
@@ -286,7 +289,25 @@ int main(void) {
                 TextFormat("TEMPO: %02d:%02d", minutos, segundos),
                 770, 75, 20, verde
             );
-
+            DrawText(
+                TextFormat("DICAS RESTANTES: %d",dica.quantidade),
+                770, 190, 20, verde //Ajeitar
+            );
+            Rectangle BotaoDica = {770, 135, 160,40};//Ajeitar
+            Color corBotaoDica;
+            if (dica.quantidade <= 0) {
+                corBotaoDica = GRAY;    // Fica cinza quando acabam as dicas
+            } else if (dica.ativa) {
+                corBotaoDica = YELLOW;  // Fica amarelo quando o jogador clicou e vai escolher a célula
+            } else {
+                corBotaoDica = verde;   // Verde padrão
+            }
+            DrawRectangleRec(BotaoDica, verde);
+            if (desenharBotao(dica.ativa ? "CANCELAR" : "USAR DICA", BotaoDica, corBotaoDica)) {
+                if (dica.quantidade > 0) {
+                    dica.ativa = !dica.ativa; // Ativa ou desativa o modo dica
+                }
+            }
             DrawText(
                 TextFormat("PONTOS: %d", jogo.pontos),
                 38, 75, 20, verde

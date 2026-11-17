@@ -5,7 +5,6 @@
 #include "raylib.h"
 #include "historico.h"
 #include <stdbool.h>
-
 #define TAMANHO 9
 #define TOTAL_SIMBOLOS 9
 #define TOTAL_FASES 2
