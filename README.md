@@ -1,21 +1,176 @@
-<h1 align = center>CyberSudoku</h1>
-<h3> O CyberSudoku é um jogo casual, onde você é um Hacker que invade um sistema resolvendo sudokus</h3>
-<div align = center>
-  <h5> (Foto do jogo será inserida aqui em breve)</h5>
-</div>
-<h3>O objetivo do jogo é preencher todas as posições com os símbolos certos</h3>
-<h3> Esse projeto foi feito por estudantes de Ciências da computação do Segundo período da Cesar School.</h3>
-<h2 align = center>Como Jogar💻</h2>
-<p>O jogo possui uma grade de células, parcialmente preenchidas com símbolos diferentes </p>
-<p>As células vazias devem ser preenchidas com as imagens corretas, respeitando as regras abaixo: </p>
-<p><b> 1. Não pode ter 2 símbolos iguais na mesma linha </b></p>
-<p><b> 2. Não pode ter 2 símbolos iguais na mesma coluna </b></p>
-<p><b> 3. Não pode ter 2 símbolos iguais no mesmo bloco(3X3)</b></p>
-<p>O jogo constitui de 2 fases e 2 dificuldades diferentes: A Fácil e a Difícil</p>
-<p>Dificuldade Fácil: Possui 4 linhas e 4 colunas, totalizando 16 células para serem preenchidas com 4 símbolos diferentes</p>
-<p>Dificuldade Difícil: Possui 9 linhas e 9 colunas, totalizando 81 células para serem preenchidas com 9 símbolos diferentes</p>
-<p> O jogo encerra quando você completa todas as fases e invade o sistema</p>
-<p><b> Para rodar o jogo escreva no terminal:</b></p>
-<p>$env:PATH = "C:\raylib\w64devkit\bin;" + $env:PATH</p>
-<p>gcc src/main.c src/menu.c src/jogo.c src/historico.c src/ranking.c -o cyber_sudoku.exe -Iinclude -Wall -Wextra -std=c11 -lraylib -lopengl32 -lgdi32 -lwinmm</p>
-<p>.\cyber_sudoku.exe </p>
+# Cyber Sudoku
+
+Cyber Sudoku é um jogo de Sudoku desenvolvido em C utilizando a biblioteca Raylib, como projeto da disciplina de Programação Imperativa e Funcional (PIF) da CESAR School.
+
+O jogo tem uma temática de invasão de sistemas, onde o jogador precisa completar os tabuleiros utilizando símbolos no lugar dos números.
+
+## Como funciona o jogo
+
+O objetivo é completar o Sudoku sem repetir símbolos na mesma linha, coluna ou bloco.
+
+O jogo possui duas fases:
+
+- **Fase 1:** Sudoku 4x4, com 4 símbolos.
+- **Fase 2:** Sudoku 9x9, com 9 símbolos.
+
+O jogador recebe 100 pontos por acerto e mais 1000 pontos ao concluir cada fase. Quando erra, a pontuação é reduzida pela metade.
+
+Também existem 3 dicas disponíveis por partida, que revelam o símbolo correto de uma célula sem dar pontos.
+
+Além disso, o jogo possui cronômetro, histórico de jogadas, pausa e ranking com os 10 melhores resultados.
+
+## Como instalar e executar
+
+O projeto foi desenvolvido e testado no Ubuntu através do WSL (Windows Subsystem for Linux), utilizando o Windows 11.
+
+Para executar o jogo, é necessário ter um ambiente Linux com GCC, Make e Raylib instalados.
+
+### 1. Instalando o WSL e o Ubuntu
+
+Caso esteja utilizando Windows e ainda não tenha o WSL instalado, abra o PowerShell como administrador e execute:
+
+```powershell
+wsl --install -d Ubuntu
+```
+
+Depois da instalação, reinicie o computador caso seja necessário.
+
+Abra o Ubuntu e faça a configuração inicial, criando um usuário e uma senha.
+
+Se já tiver o Ubuntu instalado no WSL, pode pular essa etapa.
+
+### 2. Instalando as ferramentas necessárias
+
+No terminal do Ubuntu, execute:
+
+```bash
+sudo apt update
+sudo apt install -y build-essential git cmake pkg-config
+```
+
+Esses comandos instalam as ferramentas necessárias para compilar o projeto e instalar a Raylib.
+
+### 3. Instalando as dependências da Raylib
+
+Execute:
+
+```bash
+sudo apt install -y libasound2-dev libx11-dev libxrandr-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev libxinerama-dev libwayland-dev libxkbcommon-dev
+```
+
+Essas bibliotecas são necessárias para o funcionamento dos recursos gráficos, áudio e janelas utilizados pela Raylib.
+
+### 4. Instalando a Raylib
+
+Primeiro, clone o repositório oficial da Raylib:
+
+```bash
+git clone https://github.com/raysan5/raylib.git
+```
+
+Entre na pasta:
+
+```bash
+cd raylib
+```
+
+Crie uma pasta para a compilação:
+
+```bash
+mkdir build
+cd build
+```
+
+Depois, execute:
+
+```bash
+cmake -DBUILD_EXAMPLES=OFF ..
+make
+```
+
+Por último, instale a biblioteca:
+
+```bash
+sudo make install
+sudo ldconfig
+```
+
+Depois de finalizar, volte para a pasta inicial:
+
+```bash
+cd ~
+```
+
+### 5. Clonando o projeto
+
+Agora, clone o repositório do Cyber Sudoku:
+
+```bash
+git clone https://github.com/Ranilton10/CyberSudoku-PIF.git
+```
+
+Entre na pasta do projeto:
+
+```bash
+cd CyberSudoku-PIF
+```
+
+### 6. Compilando e executando o jogo
+
+Dentro da pasta do projeto, execute:
+
+```bash
+make run
+```
+
+Esse comando compila o código e inicia o jogo.
+
+Também é possível utilizar os comandos separadamente.
+
+**Para compilar:**
+
+```bash
+make
+```
+
+**Para executar depois de compilado:**
+
+```bash
+./cyber_sudoku
+```
+
+**Para apagar o executável gerado:**
+
+```bash
+make clean
+```
+
+É importante executar esses comandos dentro da pasta principal do projeto, pois o jogo precisa acessar os arquivos de imagens, música e ranking.
+
+### 7. Observações para quem utiliza Windows
+
+Como o projeto utiliza a Raylib no ambiente Linux, recomendamos executar pelo Ubuntu através do WSL.
+
+No Windows 11, o WSL normalmente já permite abrir aplicações gráficas do Linux.
+
+Caso o jogo não abra, tente atualizar o WSL pelo PowerShell:
+
+```powershell
+wsl --update
+```
+
+Depois, execute:
+
+```powershell
+wsl --shutdown
+```
+
+Abra novamente o Ubuntu, entre na pasta do projeto e tente executar `make run`.
+
+## Vídeo do jogo
+
+Link: 
+
+## Integrantes
+
+Nicolas Vitor, Gabriel Feitosa e Ranilton Araújo.
