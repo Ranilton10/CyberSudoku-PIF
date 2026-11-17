@@ -354,15 +354,29 @@ void atualizarJogo(Jogo *jogo) {
 
             int coluna = (int)(mouse.x - x) / celula;
             int linha = (int)(mouse.y - y) / celula;
-            if (dica.ativa){
-                if(jogo->tabuleiro[linha][coluna] != jogo->solucao[linha][coluna]){
+
+            if (dica.ativa) {
+                if (dica.quantidade > 0 &&
+                    !jogo->fixas[linha][coluna] &&
+                    jogo->tabuleiro[linha][coluna] != jogo->solucao[linha][coluna]) {
+
                     jogo->tabuleiro[linha][coluna] = jogo->solucao[linha][coluna];
+                    jogo->acertou[linha][coluna] = true;
+
+                    adicionarJogada(
+                        &jogo->historico,
+                        linha,
+                        coluna,
+                        jogo->tabuleiro[linha][coluna],
+                        0
+                    );
+
                     dica.quantidade--;
                     dica.ativa = false;
+                    jogo->linhaSelecionada = linha;
+                    jogo->colunaSelecionada = coluna;
                 }
-                return;
-            }
-            if (!jogo->fixas[linha][coluna]) {
+            } else if (!jogo->fixas[linha][coluna]) {
                 int valorAnterior = jogo->tabuleiro[linha][coluna];
 
                 if (jogo->linhaSelecionada == linha &&

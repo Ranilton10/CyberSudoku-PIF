@@ -10,7 +10,9 @@
 
 #define LARGURA 1000
 #define ALTURA 700
+
 Dica dica;
+
 int main(void) {
     srand((unsigned int)time(NULL));
 
@@ -27,6 +29,7 @@ int main(void) {
     bool sair = false;
     bool jogoIniciado = false;
     bool telaCheia = false;
+    bool avisoSemDicas = false;
 
     bool emTransicao = false;
     float tempoTransicao = 0.0f;
@@ -55,6 +58,7 @@ int main(void) {
     RenderTexture2D telaJogo = LoadRenderTexture(LARGURA, ALTURA);
 
     carregarSimbolos(&jogo);
+
     dica.quantidade = 3;
     dica.ativa = false;
 
@@ -112,6 +116,10 @@ int main(void) {
             proximaFase = 1;
             tempoTransicao = 0.0f;
             emTransicao = true;
+
+            dica.quantidade = 3;
+            dica.ativa = false;
+            avisoSemDicas = false;
         }
 
         if (emTransicao) {
@@ -119,6 +127,7 @@ int main(void) {
 
             if (tempoTransicao >= 2.0f) {
                 iniciarFase(&jogo, proximaFase);
+                dica.ativa = false;
                 emTransicao = false;
                 tempoTransicao = 0.0f;
             }
@@ -289,29 +298,48 @@ int main(void) {
                 TextFormat("TEMPO: %02d:%02d", minutos, segundos),
                 770, 75, 20, verde
             );
-            DrawText(
-                TextFormat("DICAS RESTANTES: %d",dica.quantidade),
-                770, 190, 20, verde //Ajeitar
-            );
-            Rectangle BotaoDica = {770, 135, 160,40};//Ajeitar
-            Color corBotaoDica;
-            if (dica.quantidade <= 0) {
-                corBotaoDica = GRAY;    // Fica cinza quando acabam as dicas
-            } else if (dica.ativa) {
-                corBotaoDica = YELLOW;  // Fica amarelo quando o jogador clicou e vai escolher a célula
-            } else {
-                corBotaoDica = verde;   // Verde padrão
-            }
-            DrawRectangleRec(BotaoDica, verde);
-            if (desenharBotao(dica.ativa ? "CANCELAR" : "USAR DICA", BotaoDica, corBotaoDica)) {
-                if (dica.quantidade > 0) {
-                    dica.ativa = !dica.ativa; // Ativa ou desativa o modo dica
-                }
-            }
+
             DrawText(
                 TextFormat("PONTOS: %d", jogo.pontos),
                 38, 75, 20, verde
             );
+
+            if (!jogo.concluido) {
+                Rectangle botaoDica = {770, 220, 160, 45};
+
+                Color corBotaoDica = verde;
+
+                if (dica.quantidade <= 0) {
+                    corBotaoDica = GRAY;
+                } else if (dica.ativa) {
+                    corBotaoDica = YELLOW;
+                }
+
+                if (desenharBotao(
+                        dica.ativa ? "CANCELAR" : "USAR DICA",
+                        botaoDica,
+                        corBotaoDica
+                    )) {
+                    if (dica.quantidade > 0) {
+                        dica.ativa = !dica.ativa;
+                        avisoSemDicas = false;
+                    } else {
+                        avisoSemDicas = true;
+                    }
+                }
+
+                DrawText(
+                    TextFormat("DICAS RESTANTES: %d", dica.quantidade),
+                    770, 290, 18, verde
+                );
+
+                if (avisoSemDicas) {
+                    DrawText(
+                        "SEM DICAS RESTANTES",
+                        770, 325, 15, RED
+                    );
+                }
+            }
 
             if (jogo.concluido) {
                 DrawRectangle(
@@ -427,6 +455,8 @@ int main(void) {
                         telaAtual = MENU;
                         jogoIniciado = false;
                         jogador.nome[0] = '\0';
+                        dica.ativa = false;
+                        avisoSemDicas = false;
                     }
 
                 } else {
@@ -485,6 +515,8 @@ int main(void) {
                         proximaFase = jogo.fase + 1;
                         tempoTransicao = 0.0f;
                         emTransicao = true;
+                        dica.ativa = false;
+                        avisoSemDicas = false;
                     }
                 }
             }
