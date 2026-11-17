@@ -169,7 +169,7 @@ Abra novamente o Ubuntu, entre na pasta do projeto e tente executar `make run`.
 
 ## Vídeo do jogo
 
-Link: 
+Link: https://youtu.be/JS6s7DBkLEM
 
 ## Integrantes
 
